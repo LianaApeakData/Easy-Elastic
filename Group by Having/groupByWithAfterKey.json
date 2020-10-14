@@ -1,0 +1,9 @@
+GET /trainstations/_search
+{
+    "size" : 0,
+    "aggregations" : {
+    "groupby" : {
+      "composite" : {
+        "after" : {
+        "countries" : "HU"
+      }, ...

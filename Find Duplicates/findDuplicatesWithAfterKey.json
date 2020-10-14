@@ -1,0 +1,61 @@
+GET /trainstations*/_search
+{
+  "size":0,
+  "query":{
+    "bool":{
+      "filter":{
+        "terms": {
+          "_index": [
+            "trainstations",
+            "trainstations_de"
+          ]
+        }
+      }
+    }
+  },
+  "aggs": {
+    "duplicates": {
+      "composite": {
+        "size":65535,
+        "sources":[
+          {
+            "country_value":{
+            "terms":{
+              "field": "country.keyword",
+              "order" : "asc"
+            }
+            } 
+          },
+          {
+            "name_value":{
+            "terms":{
+              "field":  "name_norm.keyword" ,
+              "order" : "asc"
+            }
+          }
+          }
+          ],
+        "after" : {
+        "country_value" : "DE",
+        "name_value" : "Zwotental"
+      }
+        
+      },
+       "aggs": {
+        "having" : {
+          "bucket_selector" : {
+            "buckets_path" : {
+              "count_path":"_count"
+            },
+            "script" : {
+              "source" : "params.count_path>1",
+              "lang" : "painless"
+            },
+            "gap_policy" : "skip"
+          }
+        }
+        
+      }
+    }
+  }
+}
